@@ -1,0 +1,15 @@
+{
+  "name": "@humyn/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "style": "styles/index.scss",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./styles": "./styles/index.scss"
+  }
+}

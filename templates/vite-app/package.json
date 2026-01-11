@@ -1,0 +1,26 @@
+{
+  "name": "__APP_NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@humyn/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "sass": "^1.0.0",
+    "eslint": "^9.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  }
+}

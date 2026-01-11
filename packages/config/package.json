@@ -1,0 +1,12 @@
+{
+  "name": "@humyn/config",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/vite": "./tsconfig/vite.json",
+    "./eslint": "./eslint/base.js",
+    "./prettier": "./prettier/index.cjs"
+  }
+}

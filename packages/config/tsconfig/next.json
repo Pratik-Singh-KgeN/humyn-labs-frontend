@@ -1,0 +1,8 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "types": ["next", "next/types/global"]
+  },
+  "include": ["**/*.{ts,tsx}"]
+}

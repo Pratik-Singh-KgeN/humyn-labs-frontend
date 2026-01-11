@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "templates/vite-app" },
+    { "path": "templates/next-app" },
+    { "path": "packages/ui" },
+    { "path": "packages/generator" }
+  ]
+}
