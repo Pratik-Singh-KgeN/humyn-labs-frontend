@@ -1,4 +1,4 @@
-import { Button } from "@humyn/ui";
+import Button from "@humyn/ui/Button";
 
 export default function HomePage() {
   return (

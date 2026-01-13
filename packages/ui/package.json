@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    ".": "./index.ts",
+    "./*": "./src/components/*/index.tsx",
     "./styles": "./styles/index.scss"
   }
 }

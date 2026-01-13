@@ -8,7 +8,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      "@humyn/ui": path.resolve(__dirname, "../../packages/ui"),
+      "@humyn/ui": path.resolve(__dirname, "../../packages/ui/src/components"),
     },
   },
 
@@ -17,7 +17,7 @@ export default defineConfig({
       scss: {
         loadPaths: [
           path.resolve(__dirname, "../../"),
-          path.resolve(__dirname, "../../packages"),
+          path.resolve(__dirname, "../../packages/ui"),
         ],
       },
     },
