@@ -13,10 +13,14 @@
     "typecheck": "turbo run typecheck",
     "lint:eslint": "eslint --ext .ts,.tsx,.js,.jsx .",
     "format:prettier": "prettier --write \"**/*.{ts,tsx,js,jsx,css,scss,json,md}\"",
-    "precommit": "pnpm typecheck && pnpm lint:eslint && pnpm format:prettier"
+    "precommit": "pnpm typecheck && pnpm lint:eslint && pnpm format:prettier",
+    "test": "turbo run test",
+    "test:watch": "turbo run test --watch"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.9",
     "@types/minimist": "^1.2.5",
@@ -32,7 +36,9 @@
     "fs-extra": "^11.3.3",
     "globals": "^17.0.0",
     "husky": "^8.0.0",
+    "jsdom": "^22.1.0",
     "lint-staged": "^16.2.7",
+    "msw": "^2.12.7",
     "next": "^16.1.1",
     "prettier": "^3.7.4",
     "react": "^19.2.3",
@@ -41,7 +47,8 @@
     "turbo": "^2.7.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.52.0",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

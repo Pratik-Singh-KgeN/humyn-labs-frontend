@@ -3,7 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src"]
 }

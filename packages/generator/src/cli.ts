@@ -70,6 +70,20 @@ async function copyTemplate(
 
     await fs.writeJSON(pkgPath, pkg, { spaces: 2 });
   }
+  // add to workspace
+  const workspacePath = path.join(ROOT, "pnpm-workspace.yaml");
+  if (fs.existsSync(workspacePath)) {
+    const content = await fs.readFile(workspacePath, "utf8");
+
+    if (!content.includes("apps/*")) {
+      const updated = content.replace(
+        /packages\/\*\n?/,
+        (match) => `${match}  - apps/*\n`,
+      );
+
+      await fs.writeFile(workspacePath, updated);
+    }
+  }
 
   await replaceInFiles(dest, "__APP_NAME__", appName);
 

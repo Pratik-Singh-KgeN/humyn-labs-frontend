@@ -7,7 +7,9 @@
     "build": "vite build",
     "start": "vite preview",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx .",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts"
   },
   "dependencies": {
     "react": "^19.0.0",
