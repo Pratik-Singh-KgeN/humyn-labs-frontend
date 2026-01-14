@@ -2,355 +2,116 @@
 
 A **scalable, production-grade frontend monorepo** built with **pnpm**, **Turborepo**, **Vite**, **Next.js**, and a **shared UI design system**.
 
-This repo is designed to:
+---
 
-- Generate apps in seconds (Vite or Next)
-- Share UI, styles, and tokens safely
-- Enforce clean dependency boundaries
-- Stay fast with caching & incremental builds
+## 🏗️ App Generation & Dependency Structure
+
+### How we generate apps
+
+This monorepo uses an interactive CLI to scaffold new applications instantly. This ensures all apps follow the same directory structure, naming conventions, and dependency patterns.
+
+```bash
+# Run the app generator
+pnpm generate
+```
+
+### Dependency Logic
+
+The monorepo enforces a strict dependency flow:
+
+- **Apps** (in `apps/`) depend on **Shared Packages** (in `packages/`).
+- **Templates** (in `templates/`) are used by the generator to create new apps.
+- **Packages** (in `packages/`) provide common logic, UI components, and configurations.
+
+| Layer       | Package            | Description                                             |
+| ----------- | ------------------ | ------------------------------------------------------- |
+| **Config**  | `@humyn/config`    | Shared TypeScript, ESLint, and Prettier configurations. |
+| **UI**      | `@humyn/ui`        | Core design system, components, and global styles.      |
+| **Tooling** | `@humyn/generator` | CLI tool for scaffolding new Vite or Next.js apps.      |
 
 ---
 
-## 🧠 High-Level Architecture
+## 🧠 Project Architecture
 
 ```
 humyn-labs-frontend/
-├── apps/                 # All runnable applications
-│   ├── vite-app/         # Vite + React app
-│   ├── next-app/         # Next.js (App Router)
-│   └── <generated-apps>/
-│
-├── packages/             # Shared libraries
-│   └── ui/               # Design system (@humyn/ui)
-│
-├── templates/            # App templates used by generator
-│   ├── vite-app/
-│   └── next-app/
-│
-├── scripts/
-│   └── create-app.ts     # Interactive app generator CLI
-│
-├── turbo.json            # Turborepo pipelines
-├── pnpm-workspace.yaml   # Workspace definition
-├── package.json          # Root config
+├── apps/                 # Runnable applications (Vite / Next)
+├── packages/             # Shared workspace libraries
+│   ├── config/           # Shared tool configs (TS, ESLint, Prettier)
+│   ├── generator/        # App generation logic (@humyn/generator)
+│   └── ui/               # Core design system (@humyn/ui)
+├── templates/            # Source templates for the app generator
+│   ├── next-app/         # Next.js App Router template
+│   └── vite-app/         # Vite + React template
+├── turbo.json            # Turborepo task pipeline configuration
+├── pnpm-workspace.yaml   # Workspace member definition
+├── package.json          # Root scripts and global dev dependencies
 └── README.md
 ```
 
 ---
 
-## 📦 Package Manager: **pnpm**
+## ✨ Key Features
 
-We use **pnpm workspaces** for:
-
-- ⚡ Faster installs
-- 🔒 Strict dependency isolation
-- 🧠 Predictable builds
-
-### Important concept (VERY IMPORTANT)
-
-Each app **has its own `node_modules` folder**, but:
-
-> **Dependencies are NOT duplicated**
-
-pnpm stores packages **once** in a global store and links them using symlinks.
-
-✅ Correct
-✅ Expected
-✅ Optimal
-
----
-
-## ⚙️ Turborepo Setup
-
-### `turbo.json`
-
-```json
-{
-  "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "test": {
-      "outputs": ["coverage/**"]
-    }
-  }
-}
-```
-
-### What this gives you
-
-| Task    | Behavior                 |
-| ------- | ------------------------ |
-| `dev`   | No cache, long-running   |
-| `build` | Cached, dependency-aware |
-| `lint`  | Fast, cacheable          |
-| `test`  | Cached with coverage     |
+- **⚡ Fast Builds**: Powered by [Turborepo](https://turbo.build/) with remote and local caching.
+- **🔒 Strict Scoping**: Using [pnpm workspaces](https://pnpm.io/workspaces) to prevent ghost dependencies.
+- **🎨 Design System**: Centralized `@humyn/ui` package for consistent branding across products.
+- **🚀 One-Command Generation**: Rapidly spin up new products with `pnpm generate`.
+- **🛠️ Standardized Tooling**: Shared ESLint, Prettier, and TypeScript configs via `@humyn/config`.
+- **🧪 Testing Ready**: Pre-configured Vitest and React Testing Library setup in templates.
 
 ---
 
 ## 🎨 Shared UI Design System (`@humyn/ui`)
 
-### Location
+### Usage in Apps
 
-```
-packages/ui
-```
+**Components:**
 
-### Responsibilities
+```tsx
+import { Button } from "@humyn/ui";
 
-- Shared React components (`Button`, etc.)
-- Design tokens (colors, fonts, spacing)
-- Global SCSS variables
-- Single source of truth for styling
-
----
-
-### `@humyn/ui` package.json
-
-```json
-{
-  "name": "@humyn/ui",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts",
-    "./styles": "./styles/index.scss"
-  }
-}
+export const MyComponent = () => <Button>Click Me</Button>;
 ```
 
-### Why this matters
-
-- `import { Button } from '@humyn/ui'`
-- `@use '@humyn/ui/styles' as ui;`
-
-Works in **Vite & Next** consistently.
-
----
-
-## 🎨 SCSS Architecture (Modern & Correct)
-
-### UI styles
-
-```
-packages/ui/styles/
-├── _variables.scss
-├── index.scss
-```
-
-#### `_variables.scss`
-
-```scss
-$font-base: "Inter", system-ui, sans-serif;
-$color-primary: #6c5ce7;
-```
-
-#### `index.scss`
-
-```scss
-@forward "./variables";
-
-html,
-body {
-  font-family: $font-base;
-}
-```
-
----
-
-### App usage (Vite / Next)
+**Global Styles (SCSS):**
 
 ```scss
 @use "@humyn/ui/styles" as ui;
 
-body {
-  font-family: ui.$font-base;
+.my-element {
+  color: ui.$color-primary;
 }
 ```
 
-✅ Uses `@use / @forward` (modern Sass)
-✅ No global variable leaks
-✅ Tool-agnostic
+---
+
+## 🛠️ Development Workflow
+
+### Prerequisites
+
+- [pnpm](https://pnpm.io/) installed globally.
+- Node.js (Latest LTS recommended).
+
+### Commands
+
+| Command          | Purpose                                        |
+| ---------------- | ---------------------------------------------- |
+| `pnpm install`   | Install all dependencies across the workspace. |
+| `pnpm dev`       | Start development servers for all apps.        |
+| `pnpm build`     | Build all apps and packages.                   |
+| `pnpm generate`  | Create a new application from templates.       |
+| `pnpm lint`      | Run ESLint across the entire monorepo.         |
+| `pnpm test`      | Execute all tests using Vitest.                |
+| `pnpm typecheck` | Run TypeScript compiler checks workspace-wide. |
 
 ---
 
-## ⚛️ App Types
+## 🏁 Design Decisions
 
-### 🟢 Vite App
-
-- React + Vite
-- Fast dev server
-- Ideal for dashboards, widgets, micro-apps
-
-### 🔵 Next App
-
-- App Router
-- SSR / RSC ready
-- Production-grade SEO & routing
-
-Both apps:
-
-- Consume `@humyn/ui`
-- Share SCSS tokens
-- Live inside the same monorepo
-
----
-
-## 🧩 Module Resolution Strategy
-
-### Vite
-
-```ts
-resolve: {
-  alias: {
-    '@humyn/ui': path.resolve(__dirname, '../../packages/ui/src')
-  }
-}
-```
-
-### Next.js (Turbopack compatible)
-
-```ts
-const nextConfig = {
-  sassOptions: {
-    includePaths: ["packages/ui/styles"],
-  },
-  turbopack: {},
-};
-```
-
-👉 **No webpack config needed**
-👉 Works with Turbopack by default
-
----
-
-## 🧪 App Generator CLI
-
-### Location
-
-```
-scripts/create-app.ts
-```
-
-### What it does
-
-- Prompts for:
-  - App type (Vite / Next)
-  - App name
-
-- Copies correct template
-- Rewrites `package.json`
-- Replaces placeholders
-- Ensures `@humyn/ui` is linked
-- Tells you exactly what to run next
-
----
-
-### Usage
-
-```bash
-pnpm ts-node scripts/create-app.ts
-```
-
-Or directly:
-
-```bash
-pnpm create-app
-```
-
-(You can wire this via `bin` later)
-
----
-
-### Example flow
-
-```text
-? Choose a template › vite-app
-? App name › dashboard
-```
-
-Result:
-
-```
-apps/dashboard
-```
-
-Then run:
-
-```bash
-pnpm -w install
-pnpm dev
-```
-
----
-
-## 🧰 Root Commands
-
-| Command           | Purpose            |
-| ----------------- | ------------------ |
-| `pnpm -w install` | Install everything |
-| `pnpm dev`        | Run all apps       |
-| `pnpm build`      | Build all apps     |
-| `pnpm lint`       | Lint workspace     |
-| `pnpm test`       | Run tests          |
-
----
-
-## 🧼 .gitignore
-
-```gitignore
-node_modules/
-**/node_modules/
-.pnpm-store
-dist
-.next
-.env
-```
-
----
-
-## 🧠 Key Design Decisions (Why this works)
-
-- **pnpm** → strict + fast
-- **Turborepo** → cache & scale
-- **SCSS @use** → predictable styling
-- **Workspace UI** → no duplication
-- **Generator CLI** → zero-friction app creation
-
----
-
-## 🛣️ What’s Next?
-
-You can easily add:
-
-- Storybook for `@humyn/ui`
-- Versioned UI packages
-- CI caching with Turbo
-- App-level feature flags
-- Deployment pipelines
-
----
-
-## 🏁 Final Notes
-
-This setup is:
-
-- ✅ Enterprise-ready
-- ✅ Scales to 50+ apps
-- ✅ Tooling-agnostic
-- ✅ Easy to onboard new devs
-
-If you understand this repo — **you understand modern frontend architecture** 🔥
+- **Modular SCSS**: Using `@use` and `@forward` to avoid global namespace pollution.
+- **Template-Driven**: New apps aren't built from scratch; they are cloned from vetted templates to reduce technical debt.
+- **Turborepo Pipelines**: Orchestrates complex build orders (e.g., ensuring `ui` is built before `apps` that use it).
 
 ---
 
