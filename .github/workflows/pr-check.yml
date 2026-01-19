@@ -1,46 +1,44 @@
-name: PR Validation
+name: PR Checks
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  validate:
+  verify:
+    name: lint-test-affected
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout full history (needed for git diff)
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # REQUIRED for git diff to work
 
-      # 2️⃣ Setup Node
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: pnpm
 
-      # 3️⃣ Install pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      # 4️⃣ Install dependencies
       - name: Install dependencies
         run: pnpm install
 
-      # 5️⃣ Lint + Prettier + Typecheck
       - name: Lint
-        run: pnpm lint:eslint
-
-      - name: Prettier check
-        run: pnpm format:prettier --check
+        run: pnpm lint
 
       - name: Typecheck
         run: pnpm typecheck
 
-      # 6️⃣ Run affected tests (same logic as local)
+      - name: Prettier check
+        run: pnpm format:prettier --check
+
       - name: Run affected tests
         env:
           GIT_BASE: origin/main
