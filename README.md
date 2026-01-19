@@ -69,7 +69,7 @@ humyn-labs-frontend/
 **Components:**
 
 ```tsx
-import { Button } from "@humyn/ui";
+import Button from "@humyn/ui/Button";
 
 export const MyComponent = () => <Button>Click Me</Button>;
 ```
