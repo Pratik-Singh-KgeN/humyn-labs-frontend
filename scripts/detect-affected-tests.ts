@@ -4,15 +4,18 @@ import path from "node:path";
 
 /**
  * ---------------------------------------------
- * STEP 1: Figure out what changed using git diff
+ * STEP 1: Determine base branch
  * ---------------------------------------------
- *
- * - We compare HEAD with a base branch.
- * - Base branch is configurable via env (for CI safety).
- * - Defaults to origin/main for local dev.
  */
 
 const BASE = process.env.GIT_BASE ?? "origin/main";
+const OUTPUT_JSON = process.env.OUTPUT_JSON === "1";
+
+/**
+ * ---------------------------------------------
+ * STEP 2: Git diff
+ * ---------------------------------------------
+ */
 
 const diff = execSync(`git diff --name-only ${BASE}...HEAD`, {
   stdio: ["pipe", "pipe", "ignore"],
@@ -24,7 +27,7 @@ const diff = execSync(`git diff --name-only ${BASE}...HEAD`, {
 
 /**
  * ---------------------------------------------
- * STEP 2: Track affected scopes
+ * STEP 3: Track affected scopes
  * ---------------------------------------------
  */
 
@@ -36,33 +39,28 @@ let configChanged = false;
 
 /**
  * ---------------------------------------------
- * STEP 3: Detect direct file changes
+ * STEP 4: Direct change detection
  * ---------------------------------------------
  */
 
 for (const file of diff) {
-  // Root-level file (README, turbo.json, etc.)
   if (!file.includes("/")) {
     rootChanged = true;
   }
 
-  // apps/<app-name>/...
   if (file.startsWith("apps/")) {
     affected.add(file.split("/")[1]);
   }
 
-  // UI package
   if (file.startsWith("packages/ui")) {
     uiChanged = true;
     affected.add("@humyn/ui");
   }
 
-  // Shared config package
   if (file.startsWith("packages/config")) {
     configChanged = true;
   }
 
-  // Templates
   if (file.startsWith("templates/next-app")) {
     affected.add("template-next");
   }
@@ -74,12 +72,8 @@ for (const file of diff) {
 
 /**
  * ---------------------------------------------
- * STEP 4: SAFE grep helpers
+ * STEP 5: Safe grep helpers
  * ---------------------------------------------
- *
- * - Restrict to source files only
- * - Exclude node_modules
- * - Prevent false positives & slowness
  */
 
 function grepSafe(pattern: string, dir: string): boolean {
@@ -105,63 +99,69 @@ function appUsesConfig(appPath: string): boolean {
 
 /**
  * ---------------------------------------------
- * STEP 5: Dependency-based propagation
+ * STEP 6: Dependency propagation
  * ---------------------------------------------
  */
 
-// If UI changed → run tests for apps that import UI
-if (uiChanged) {
-  const appsDir = path.join(process.cwd(), "apps");
+const appsDir = path.join(process.cwd(), "apps");
 
-  if (fs.existsSync(appsDir)) {
-    for (const app of fs.readdirSync(appsDir)) {
-      const appPath = path.join(appsDir, app);
-
-      if (appUsesUI(appPath)) {
-        affected.add(app);
-      }
+if (uiChanged && fs.existsSync(appsDir)) {
+  for (const app of fs.readdirSync(appsDir)) {
+    if (appUsesUI(path.join(appsDir, app))) {
+      affected.add(app);
     }
   }
 }
 
-// If config changed → run tests for apps using config
-if (configChanged) {
-  const appsDir = path.join(process.cwd(), "apps");
-
-  if (fs.existsSync(appsDir)) {
-    for (const app of fs.readdirSync(appsDir)) {
-      const appPath = path.join(appsDir, app);
-
-      if (appUsesConfig(appPath)) {
-        affected.add(app);
-      }
+if (configChanged && fs.existsSync(appsDir)) {
+  for (const app of fs.readdirSync(appsDir)) {
+    if (appUsesConfig(path.join(appsDir, app))) {
+      affected.add(app);
     }
   }
 }
 
-// Root tests (only if root has tests)
 if (rootChanged && fs.existsSync("test")) {
   affected.add("root");
 }
 
 /**
  * ---------------------------------------------
- * STEP 6: Exit early if nothing is affected
+ * STEP 7: Exit early if nothing affected
  * ---------------------------------------------
  */
 
 if (affected.size === 0) {
   console.log("✅ No affected tests detected");
+
+  if (OUTPUT_JSON) {
+    console.log(JSON.stringify({ affected: [] }));
+  }
+
   process.exit(0);
 }
 
 /**
  * ---------------------------------------------
- * STEP 7: Run Turbo with filters
+ * STEP 8: Optional JSON output (CI use only)
  * ---------------------------------------------
  */
 
-const filters = [...affected].map((pkg) => `--filter=${pkg}`).join(" ");
+if (OUTPUT_JSON) {
+  console.log(
+    JSON.stringify({
+      affected: [...affected],
+    }),
+  );
+}
+
+/**
+ * ---------------------------------------------
+ * STEP 9: Run tests (UNCHANGED BEHAVIOR)
+ * ---------------------------------------------
+ */
+
+const filters = [...affected].map((p) => `--filter=${p}`).join(" ");
 
 console.log("🧪 Running tests for:", [...affected].join(", "));
 
