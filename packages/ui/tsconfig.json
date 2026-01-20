@@ -2,7 +2,8 @@
   "extends": "../config/tsconfig/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "composite": true,
+    "composite": false,
+    "incremental": false,
     "declaration": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
