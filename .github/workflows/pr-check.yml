@@ -1,39 +1,46 @@
-name: PR Checks
+name: PR Validation
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  verify:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1️⃣ Checkout full history (needed for git diff)
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # 2️⃣ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
-      - name: Enable Corepack
-        run: corepack enable
+      # 3️⃣ Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
 
+      # 4️⃣ Install dependencies
       - name: Install dependencies
         run: pnpm install
 
+      # 5️⃣ Lint + Prettier + Typecheck
       - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm lint:eslint
 
       - name: Prettier check
         run: pnpm format:prettier --check
 
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # 6️⃣ Run affected tests (same logic as local)
       - name: Run affected tests
         env:
           GIT_BASE: origin/main
