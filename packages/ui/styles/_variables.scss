@@ -1,14 +1,65 @@
-/* Colors */
-$color-primary: #6c5ce7;
-$color-secondary: #00cec9;
-$color-danger: #d63031;
-$app-background: #a8a8a8;
+/* ===============================
+   SCSS DESIGN TOKENS
+================================ */
 
-/* Typography */
+$primary-accent: #ff6e42;
+$secondary-accent: #c8f0ff;
+$primary-base: #e5e3df;
+$secondary-base: #383532;
+
 $font-base: "Inter", system-ui, sans-serif;
 
-/* Spacing */
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 16px;
 $spacing-lg: 24px;
+
+/* ===============================
+   CSS VARIABLES (FROM SCSS)
+================================ */
+
+:root {
+  /* Original variables for SCSS-dependent apps */
+  --primary-accent: #{$primary-accent};
+  --secondary-accent: #{$secondary-accent};
+  --primary-base: #{$primary-base};
+  --secondary-base: #{$secondary-base};
+
+  --font-base: #{$font-base};
+
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+
+  /* Shadcn/Tailwind compatible variables (HSL format) */
+  --primary: 262 80% 65%; /* HSL for #6c5ce7 */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 177 100% 40%; /* HSL for #00cec9 */
+  --secondary-foreground: 0 0% 100%;
+
+  --destructive: 358 76% 51%; /* HSL for #d63031 */
+  --destructive-foreground: 0 0% 100%;
+
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 10%;
+
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 262 80% 65%;
+
+  --radius: 0.5rem;
+}

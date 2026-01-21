@@ -1,7 +1,20 @@
-import { HTMLAttributes } from "react";
+import {
+  Button as ShadcnButton,
+  ButtonProps as ShadcnButtonProps,
+} from "../ui/button";
+import { cn } from "../../lib/utils";
 
-type ButtonProps = HTMLAttributes<HTMLButtonElement>;
+import styles from "./Button.module.scss";
 
-export default function Button(props: ButtonProps) {
-  return <button {...props}>{props.children}</button>;
+export type ButtonProps = ShadcnButtonProps;
+
+export default function Button({ className, ...props }: ButtonProps) {
+  return (
+    <ShadcnButton
+      className={cn(styles["button-animated"], className)}
+      {...props}
+    >
+      {props.children}
+    </ShadcnButton>
+  );
 }
