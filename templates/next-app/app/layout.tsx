@@ -1,4 +1,5 @@
 import "./global.scss"; // App-specific global styles
+import "@humyn/ui/dist/styles.css";
 
 import type { Metadata } from "next";
 

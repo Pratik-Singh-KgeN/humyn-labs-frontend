@@ -6,13 +6,38 @@
   "main": "index.ts",
   "style": "styles/index.scss",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "npm run build:css && tsc --noEmit",
+    "build:css": "postcss src/styles/tailwind.css -o dist/styles.css --minify",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "exports": {
     "./*": "./src/components/*/index.tsx",
-    "./styles": "./styles/index.scss"
+    "./lib/*": "./src/lib/*",
+    "./components/ui/*": "./src/components/ui/*",
+    "./styles": "./styles/index.scss",
+    "./tailwind-styles": {
+      "import": "./dist/styles.css",
+      "default": "./dist/styles.css"
+    },
+    "./dist/styles.css": {
+      "import": "./dist/styles.css",
+      "default": "./dist/styles.css"
+    }
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.0",
+    "sass": "^1.97.2",
+    "tailwindcss": "^4.1.18"
   }
 }

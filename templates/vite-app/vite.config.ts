@@ -8,6 +8,8 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      "@humyn/ui/dist": path.resolve(__dirname, "../../packages/ui/dist"),
+      "@humyn/ui/lib": path.resolve(__dirname, "../../packages/ui/src/lib"),
       "@humyn/ui": path.resolve(__dirname, "../../packages/ui/src/components"),
     },
   },
