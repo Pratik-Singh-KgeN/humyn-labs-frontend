@@ -43,6 +43,8 @@ let configChanged = false;
  * ---------------------------------------------
  */
 
+const affectedTemplates = new Set<string>();
+
 for (const file of diff) {
   if (!file.includes("/")) {
     rootChanged = true;
@@ -62,19 +64,24 @@ for (const file of diff) {
   }
 
   if (file.startsWith("templates/next-app")) {
-    affected.add("template-next");
+    affectedTemplates.add("templates/next-app");
   }
 
   if (file.startsWith("templates/vite-app")) {
-    affected.add("template-vite");
+    affectedTemplates.add("templates/vite-app");
   }
 }
 
 /**
  * ---------------------------------------------
- * STEP 5: Safe grep helpers
+ * STEP 5: Safe grep/json helpers
  * ---------------------------------------------
  */
+
+interface PackageJson {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
 
 function grepSafe(pattern: string, dir: string): boolean {
   try {
@@ -87,6 +94,26 @@ function grepSafe(pattern: string, dir: string): boolean {
   } catch {
     return false;
   }
+}
+
+function getPackageJson(appPath: string): PackageJson | null {
+  const pkgPath = path.join(appPath, "package.json");
+  if (!fs.existsSync(pkgPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function isNextApp(appPath: string): boolean {
+  const pkg = getPackageJson(appPath);
+  return Boolean(pkg?.dependencies?.["next"] || pkg?.devDependencies?.["next"]);
+}
+
+function isViteApp(appPath: string): boolean {
+  const pkg = getPackageJson(appPath);
+  return Boolean(pkg?.dependencies?.["vite"] || pkg?.devDependencies?.["vite"]);
 }
 
 function appUsesUI(appPath: string): boolean {
@@ -105,17 +132,28 @@ function appUsesConfig(appPath: string): boolean {
 
 const appsDir = path.join(process.cwd(), "apps");
 
-if (uiChanged && fs.existsSync(appsDir)) {
-  for (const app of fs.readdirSync(appsDir)) {
-    if (appUsesUI(path.join(appsDir, app))) {
+if (fs.existsSync(appsDir)) {
+  const apps = fs.readdirSync(appsDir);
+
+  for (const app of apps) {
+    const appPath = path.join(appsDir, app);
+    if (!fs.statSync(appPath).isDirectory()) continue;
+
+    // UI propagation
+    if (uiChanged && appUsesUI(appPath)) {
       affected.add(app);
     }
-  }
-}
 
-if (configChanged && fs.existsSync(appsDir)) {
-  for (const app of fs.readdirSync(appsDir)) {
-    if (appUsesConfig(path.join(appsDir, app))) {
+    // Config propagation
+    if (configChanged && appUsesConfig(appPath)) {
+      affected.add(app);
+    }
+
+    // Template propagation
+    if (affectedTemplates.has("templates/next-app") && isNextApp(appPath)) {
+      affected.add(app);
+    }
+    if (affectedTemplates.has("templates/vite-app") && isViteApp(appPath)) {
       affected.add(app);
     }
   }
@@ -131,7 +169,7 @@ if (rootChanged && fs.existsSync("test")) {
  * ---------------------------------------------
  */
 
-if (affected.size === 0) {
+if (affected.size === 0 && affectedTemplates.size === 0) {
   console.log("✅ No affected tests detected");
 
   if (OUTPUT_JSON) {
@@ -151,6 +189,7 @@ if (OUTPUT_JSON) {
   console.log(
     JSON.stringify({
       affected: [...affected],
+      templates: [...affectedTemplates],
     }),
   );
 }
@@ -161,8 +200,30 @@ if (OUTPUT_JSON) {
  * ---------------------------------------------
  */
 
-const filters = [...affected].map((p) => `--filter=${p}`).join(" ");
+if (affected.size > 0) {
+  const filters = [...affected].map((p) => `--filter=${p}`).join(" ");
+  console.log("🧪 Running tests for apps/packages:", [...affected].join(", "));
+  try {
+    execSync(`pnpm turbo run test ${filters}`, { stdio: "inherit" });
+  } catch (err) {
+    process.exit(1);
+  }
+}
 
-console.log("🧪 Running tests for:", [...affected].join(", "));
-
-execSync(`pnpm turbo run test ${filters}`, { stdio: "inherit" });
+if (affectedTemplates.size > 0) {
+  console.log(
+    "🧪 Running tests for templates:",
+    [...affectedTemplates].join(", "),
+  );
+  for (const templateDir of affectedTemplates) {
+    console.log(`\n👉 Testing template: ${templateDir}`);
+    try {
+      execSync(`pnpm test`, {
+        cwd: path.join(process.cwd(), templateDir),
+        stdio: "inherit",
+      });
+    } catch (err) {
+      process.exit(1);
+    }
+  }
+}
