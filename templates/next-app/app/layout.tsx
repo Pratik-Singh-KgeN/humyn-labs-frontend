@@ -1,4 +1,3 @@
-import "@humyn/ui"; // UI design system styles
 import "./global.scss"; // App-specific global styles
 
 import type { Metadata } from "next";
