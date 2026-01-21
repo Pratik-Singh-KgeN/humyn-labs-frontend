@@ -55,14 +55,6 @@ for (const file of diff) {
   if (file.startsWith("packages/config")) {
     configChanged = true;
   }
-
-  if (file.startsWith("templates/next-app")) {
-    affected.add("template-next");
-  }
-
-  if (file.startsWith("templates/vite-app")) {
-    affected.add("template-vite");
-  }
 }
 
 /**
