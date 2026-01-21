@@ -6,6 +6,7 @@
   "main": "index.ts",
   "style": "styles/index.scss",
   "scripts": {
+    "add": "pnpm dlx shadcn@latest add",
     "build": "npm run build:css && tsc --noEmit",
     "build:css": "postcss src/styles/tailwind.css -o dist/styles.css --minify",
     "typecheck": "tsc --noEmit",
