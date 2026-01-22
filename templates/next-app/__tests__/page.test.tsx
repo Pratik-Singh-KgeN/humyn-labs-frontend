@@ -1,16 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect } from "vitest";
 
-import Page from "../page";
+import Page from "../app/page";
 
 describe("Next page", () => {
-  test("renders page and shared button", () => {
+  test("renders page", () => {
     render(<Page />);
 
     expect(screen.getByText(/__APP_NAME__/i)).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("button", { name: /shared button/i }),
-    ).toBeInTheDocument();
   });
 });

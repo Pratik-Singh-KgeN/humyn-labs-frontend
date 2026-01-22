@@ -1,6 +1,7 @@
-@use "@humyn/ui/styles" as *;
+@use "styles" as ui;
 
-/* App overrides or additions only */
 body {
-  background: $primary-base;
+  font-family: ui.$font-base;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }
