@@ -1,0 +1,16 @@
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-primary: #2563eb;
+  --color-secondary: #e5e7eb;
+  --color-border: #e2e8f0;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+/* Brand: humyn-bd */
+.humyn-bd {
+  --color-primary: #1d4ed8;
+}
