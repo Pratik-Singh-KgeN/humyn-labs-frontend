@@ -1,4 +1,3 @@
-import "./theme.css";
 import "./global.scss";
 import "@humyn/ui/dist/styles.css";
 
