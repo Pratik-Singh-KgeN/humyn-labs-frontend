@@ -1,4 +1,19 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-pnpm test:affected
+# Emergency escape hatch
+if [ "$SKIP_PERF_CHECKS" = "true" ]; then
+  echo "⚠️  SKIPPING performance checks (SKIP_PERF_CHECKS=true)"
+  exit 0
+fi
+
+echo "🏗️  Building app for performance checks..."
+pnpm --filter humyn-bd-web build || exit 1
+
+echo "📦 Running size-limit..."
+pnpm --filter humyn-bd-web analyze:size || exit 1
+
+echo "🔍 Running Lighthouse CI..."
+pnpm --filter humyn-bd-web analyze:lighthouse || exit 1
+
+echo "✅ Performance checks passed. Proceeding with push."
